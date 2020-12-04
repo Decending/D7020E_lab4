@@ -1,0 +1,5 @@
+cargo:rustc-link-lib=static=cortex-m
+cargo:rustc-link-search=/home/kalle/Desktop/rtic_f4xx_nucleo-master/target/thumbv7em-none-eabi/release/build/cortex-m-80d86ea4302f3760/out
+cargo:rustc-cfg=cortex_m
+cargo:rustc-cfg=armv7m
+cargo:rustc-cfg=armv7em

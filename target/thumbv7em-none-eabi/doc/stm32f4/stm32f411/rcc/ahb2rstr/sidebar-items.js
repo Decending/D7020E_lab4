@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["OTGFSRST_A","USB OTG FS module reset"]],"struct":[["OTGFSRST_W","Write proxy for field `OTGFSRST`"]],"type":[["OTGFSRST_R","Reader of field `OTGFSRST`"],["R","Reader of register AHB2RSTR"],["W","Writer for register AHB2RSTR"]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["TIMPRE_A","Timers clocks prescalers selection"]],"struct":[["TIMPRE_W","Write proxy for field `TIMPRE`"]],"type":[["R","Reader of register DCKCFGR"],["TIMPRE_R","Reader of field `TIMPRE`"],["W","Writer for register DCKCFGR"]]});

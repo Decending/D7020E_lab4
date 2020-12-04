@@ -1,0 +1,92 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `rtt_target` crate."><meta name="keywords" content="rust, rustlang, rust-lang, rtt_target"><title>rtt_target - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script src="../storage.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../rtt_target/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><p class='location'>Crate rtt_target</p><div class='block version'><p>Version 0.3.0</p></div><div class="sidebar-elems"><a id='all-types' href='all.html'><p>See all rtt_target's items</p></a><div class="block items"><ul><li><a href="#macros">Macros</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#functions">Functions</a></li><li><a href="#types">Type Definitions</a></li></ul></div><p class='location'></p><script>window.sidebarCurrent = {name: 'rtt_target', ty: 'mod', relpath: '../'};</script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
+                <a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../src/rtt_target/lib.rs.html#1-355' title='goto source code'>[src]</a></span><span class='in-band'>Crate <a class="mod" href=''>rtt_target</a></span></h1><div class='docblock'><p>Target side implementation of the RTT (Real-Time Transfer) I/O protocol</p>
+<p>RTT implements input and output to/from a debug probe using in-memory ring buffers and memory
+polling. This enables debug logging from the microcontroller with minimal delays and no
+blocking, making it usable even in real-time applications where e.g. semihosting delays cannot
+be tolerated.</p>
+<h1 id="hardware-support" class="section-header"><a href="#hardware-support">Hardware support</a></h1>
+<p>This crate is platform agnostic and can be used on any chip that supports background memory
+access via its debug interface. The printing macros require a critical section which is
+platform-dependent. Built-in ARM Cortex-M support can be enabled with the &quot;cortex-m&quot; feature,
+and RISC-V support can be enabled with the &quot;riscv&quot; feature.</p>
+<p>To interface with RTT from the host computer, a debug probe such as an ST-Link or J-Link is
+required. The normal debug protocol (e.g. SWD) is used to access RTT, so no extra connections
+such as SWO pins are needed.</p>
+<h1 id="initialization" class="section-header"><a href="#initialization">Initialization</a></h1>
+<p>RTT must be initialized at the start of your program using one of the init macros. See the
+macros for more details.</p>
+<p>The initialization macros return channel objects that can be used for writing and reading.
+Different channel objects can safely be used concurrently in different contexts without locking.
+In an interrupt-based application with realtime constraints you could use a separate channel for
+every interrupt context to allow for lock-free logging.</p>
+<h1 id="channels-and-virtual-terminals" class="section-header"><a href="#channels-and-virtual-terminals">Channels and virtual terminals</a></h1>
+<p>RTT supports multiple <em>channels</em> in both directions. Up channels go from target to host, and
+down channels go from host to target. Each channel is identified by its direction and number.</p>
+<p>By convention channel 0 is reserved for terminal use. In the up direction there is a set of
+escape sequences that further enable the single channel to be treated as up to 16 <em>virtual
+terminals</em>. This can be used to separate different types of messages (for example, log levels)
+from each other without having to allocate memory for multiple buffers. As a downside, multiple
+threads cannot write to the same channel at once, even if using different virtual terminal
+numbers, so access has to be synchronized. Down channel 0 is conventionally used for keyboard
+input.</p>
+<p><strong>Note:</strong> Some host side programs only display channel 0 by default, so to see the other
+channels you might need to configure them appropriately.</p>
+<p>The other channels can be used to either enable concurrent use from multiple sources without
+locking, or to send e.g. binary data in either direction.</p>
+<p>Channel 0 can also be used for arbitrary data, but most tools expect it to be plain text.</p>
+<h1 id="channel-modes" class="section-header"><a href="#channel-modes">Channel modes</a></h1>
+<p>By default, channels start in <a href="../rtt_target/enum.ChannelMode.html#variant.NoBlockSkip"><code>NoBlockSkip</code></a> mode, which discards
+data if the buffer is full. This enables RTT to not crash the application if there is no debug
+probe attached or if the host is not reading the buffers. However if the application outputs
+faster than the host can read (which is easy to do, because writing is very fast), messages will
+be lost. Channels can be set to blocking mode if this is desirable, however in that case the
+application will likely freeze when the buffer fills up if a debugger is not attached.</p>
+<p>The channel mode can also be changed on the fly by the debug probe. Therefore it may be
+advantageous to use a non-blocking mode in your microcontroller code, and set a blocking mode as
+needed when debugging. That way you will never end up with an application that freezes without a
+debugger connected.</p>
+<h1 id="printing" class="section-header"><a href="#printing">Printing</a></h1>
+<p>For no-hassle output the <a href="../rtt_target/macro.rprint.html" title="rprint"><code>rprint</code></a> and <a href="../rtt_target/macro.rprintln.html" title="rprintln"><code>rprintln</code></a> macros are provided. They use a single down
+channel defined at initialization time, and a critical section for synchronization, and they
+therefore work exactly like the standard <code>println</code> style macros. They can be used from any
+context. The <a href="../rtt_target/macro.rtt_init_print.html" title="rtt_init_print"><code>rtt_init_print</code></a> convenience macro initializes printing on channel 0.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+<span class="kw">use</span> <span class="ident">rtt_target</span>::{<span class="ident">rtt_init_print</span>, <span class="ident">rprintln</span>};
+
+<span class="kw">fn</span> <span class="ident">main</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="op">!</span> {
+    <span class="macro">rtt_init_print</span><span class="macro">!</span>();
+    <span class="kw">loop</span> {
+        <span class="macro">rprintln</span><span class="macro">!</span>(<span class="string">&quot;Hello, world!&quot;</span>);
+    }
+}</pre></div>
+<p>The macros also support an extended syntax to print to different RTT virtual terminals.</p>
+<p>Please note that because a critical section is used, printing into a blocking channel will cause
+the application to block and freeze when the buffer is full.</p>
+</div><h2 id='macros' class='section-header'><a href="#macros">Macros</a></h2>
+<table><tr class='module-item'><td><a class="macro" href="macro.rprint.html" title='rtt_target::rprint macro'>rprint</a></td><td class='docblock-short'><p>Prints to the print RTT channel. Works just like the standard <code>print</code>.</p>
+</td></tr><tr class='module-item'><td><a class="macro" href="macro.rprintln.html" title='rtt_target::rprintln macro'>rprintln</a></td><td class='docblock-short'><p>Prints to the print RTT channel, with a newline. Works just like the standard <code>println</code>.</p>
+</td></tr><tr class='module-item'><td><a class="macro" href="macro.rtt_init.html" title='rtt_target::rtt_init macro'>rtt_init</a></td><td class='docblock-short'><p>Initializes RTT with the specified channels. Channel numbers, buffer sizes and names can be
+defined.</p>
+</td></tr><tr class='module-item'><td><a class="macro" href="macro.rtt_init_default.html" title='rtt_target::rtt_init_default macro'>rtt_init_default</a></td><td class='docblock-short'><p>Initializes RTT with default up/down channels.</p>
+</td></tr><tr class='module-item'><td><a class="macro" href="macro.rtt_init_print.html" title='rtt_target::rtt_init_print macro'>rtt_init_print</a></td><td class='docblock-short'><p>Initializes RTT with a single up channel and sets it as the print channel for the printing
+macros.</p>
+</td></tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table><tr class='module-item'><td><a class="struct" href="struct.DownChannel.html" title='rtt_target::DownChannel struct'>DownChannel</a></td><td class='docblock-short'><p>RTT down (host to target) channel</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.TerminalChannel.html" title='rtt_target::TerminalChannel struct'>TerminalChannel</a></td><td class='docblock-short'><p>An up channel that supports writing into multiple virtual terminals within the same buffer.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.TerminalWriter.html" title='rtt_target::TerminalWriter struct'>TerminalWriter</a></td><td class='docblock-short'><p>Formatted writing operation. Don't store an instance of this, but rather create a new one for
+every write.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.UpChannel.html" title='rtt_target::UpChannel struct'>UpChannel</a></td><td class='docblock-short'><p>RTT up (target to host) channel</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.uWriter.html" title='rtt_target::uWriter struct'>uWriter</a></td><td class='docblock-short'><p>Writer for ufmt. Don't store an instance of this, but rather create a new one for every write.</p>
+</td></tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
+<table><tr class='module-item'><td><a class="enum" href="enum.ChannelMode.html" title='rtt_target::ChannelMode enum'>ChannelMode</a></td><td class='docblock-short'><p>Specifies what to do when a channel doesn't have enough buffer space for a complete write.</p>
+</td></tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+<table><tr class='module-item'><td><a class="fn" href="fn.set_print_channel.html" title='rtt_target::set_print_channel fn'>set_print_channel</a></td><td class='docblock-short'><p>Sets the channel to use for <a href="../rtt_target/macro.rprint.html" title="rprint"><code>rprint</code></a> and <a href="../rtt_target/macro.rprintln.html" title="rprintln"><code>rprintln</code></a>.</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.set_print_channel_cs.html" title='rtt_target::set_print_channel_cs fn'>set_print_channel_cs</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td><td class='docblock-short'><p>Sets the channel to use for <a href="../rtt_target/macro.rprint.html" title="rprint"><code>rprint</code></a> and <a href="../rtt_target/macro.rprintln.html" title="rprintln"><code>rprintln</code></a> and the critical section function used
+to synchronize printing. You should only use this function if the <a href="../rtt_target/fn.set_print_channel.html" title="set_print_channel"><code>set_print_channel</code></a> function
+isn't available on your platform.</p>
+</td></tr></table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
+<table><tr class='module-item'><td><a class="type" href="type.CriticalSectionFunc.html" title='rtt_target::CriticalSectionFunc type'>CriticalSectionFunc</a></td><td class='docblock-short'><p>Type-erased critical section function used to synchronize printing.</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../";window.currentCrate = "rtt_target";</script><script src="../main.js"></script><script defer src="../search-index.js"></script></body></html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `panic_semihosting` crate."><meta name="keywords" content="rust, rustlang, rust-lang, panic_semihosting"><title>panic_semihosting - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script src="../storage.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../panic_semihosting/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><p class='location'>Crate panic_semihosting</p><div class='block version'><p>Version 0.5.6</p></div><div class="sidebar-elems"><a id='all-types' href='all.html'><p>See all panic_semihosting's items</p></a><p class='location'></p><script>window.sidebarCurrent = {name: 'panic_semihosting', ty: 'mod', relpath: '../'};</script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
+                <a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../src/panic_semihosting/lib.rs.html#1-96' title='goto source code'>[src]</a></span><span class='in-band'>Crate <a class="mod" href=''>panic_semihosting</a></span></h1><div class='docblock'><p>Report panic messages to the host stderr using semihosting</p>
+<p>This crate contains an implementation of <code>panic_fmt</code> that logs panic messages to the host stderr
+using <a href="https://crates.io/crates/cortex-m-semihosting"><code>cortex-m-semihosting</code></a>. Before logging the message the panic handler disables (masks)
+the device specific interrupts. After logging the message the panic handler trigger a breakpoint
+and then goes into an infinite loop.</p>
+<p>Currently, this crate only supports the ARM Cortex-M architecture.</p>
+<h1 id="usage" class="section-header"><a href="#usage">Usage</a></h1>
+<div class='information'><div class='tooltip ignore'>ⓘ<span class='tooltiptext'>This example is not tested</span></div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
+<span class="attribute">#![<span class="ident">no_std</span>]</span>
+
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">panic_semihosting</span>;
+
+<span class="kw">fn</span> <span class="ident">main</span>() {
+    <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;FOO&quot;</span>)
+}</pre></div>
+<pre><code class="language-text">(gdb) monitor arm semihosting enable
+(gdb) continue
+Program received signal SIGTRAP, Trace/breakpoint trap.
+rust_begin_unwind (args=..., file=..., line=8, col=5)
+    at $CRATE/src/lib.rs:69
+69          asm::bkpt();
+</code></pre>
+<pre><code class="language-text">$ openocd -f (..)
+(..)
+panicked at 'FOO', src/main.rs:6:5
+</code></pre>
+<h1 id="optional-features" class="section-header"><a href="#optional-features">Optional features</a></h1><h2 id="exit" class="section-header"><a href="#exit"><code>exit</code></a></h2>
+<p>When this feature is enabled the panic handler performs an exit semihosting call after logging
+the panic message. This is useful when emulating the program on QEMU as it causes the QEMU
+process to exit with a non-zero exit code; thus it can be used to implement Cortex-M tests that
+run on the host.</p>
+<p>We discourage using this feature when the program will run on hardware as the exit call can
+leave the hardware debugger in an inconsistent state.</p>
+<h2 id="inline-asm" class="section-header"><a href="#inline-asm"><code>inline-asm</code></a></h2>
+<p>When this feature is enabled semihosting is implemented using inline assembly (<code>asm!</code>) and
+compiling this crate requires nightly.</p>
+<p>When this feature is disabled semihosting is implemented using FFI calls into an external
+assembly file and compiling this crate works on stable and beta.</p>
+</div></section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../";window.currentCrate = "panic_semihosting";</script><script src="../main.js"></script><script defer src="../search-index.js"></script></body></html>

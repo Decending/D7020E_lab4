@@ -40,9 +40,9 @@ const APP: () = {
         rtic::pend(stm32f411::Interrupt::EXTI0);
         asm::bkpt();
         cx.resources.shared.lock(|shared| {
-            // asm::bkpt();
+            asm::bkpt();
             *shared += 1;
-            // asm::bkpt();
+            asm::bkpt();
         });
         asm::bkpt();
     }
@@ -127,11 +127,13 @@ const APP: () = {
 //
 // What was the software latency observed to enter the task?
 //
-// [Your answer here]
+// [My answer here]
+// 14 clockcycles (16-2)
 //
 // Does RTIC infer any overhead?
 //
-// [Your answer here]
+// [My answer here]
+// Yes
 //
 // The debugger reports that the breakpoint was hit in the `run<closure>`.
 // The reason is that the RTIC implements the actual interrupt handler,
@@ -149,14 +151,19 @@ const APP: () = {
 //
 // (gdb) x 0xe0001004
 //
-// [Your answer here]
+// [My answer here]
+// Hexadecimal: 0x00000025
+// Decimal: 37
 //
 // You should have a total execution time in the range of 30-40 cycles.
 //
 // Explain the reason (for this case) that resource access in
 // `exti0` was safe without locking the resource.
 //
-// [Your answer here]
+// [My answer here]
+// BASEPRI sätts till != 0, så alla threads med lägre prioritering blir 
+// blockerade tills BASEPRI tillåter det / den nuvarande threaden är 
+// terminerad
 //
 // In `exti1` we also access `shared` but this time through a lock.
 //
@@ -184,12 +191,14 @@ const APP: () = {
 //
 // (gdb) x 0xe0001004
 //
-// [Your answer here]
+// [My answer here]
+// Hexadecimal: 0x00000034
+// Decimal: 52
 //
 // Calculate the total time (in cycles), for this section of code.
 //
-// [Your answer here]
-//
+// [My answer here]
+// 15 cycles (52 - 37)
 // You should get a value around 15 cycles.
 //
 // Now look at the "critical section", i.e., how many cycles
@@ -228,7 +237,9 @@ const APP: () = {
 //
 // (gdb) x 0xe0001004
 //
-// [Your answer here]
+// [My answer here]
+// Hexadecimal: 0x00000028
+// Decimal: 40
 //
 // (gdb) c
 //
@@ -238,14 +249,16 @@ const APP: () = {
 //
 // (gdb) x 0xe0001004
 //
-// [Your answer here]
-//
+// [My answer here]
+// Hexadecimal: 0x00000032
+// Decimal: 50
 // From a real-time perspective the critical section infers
 // blocking (of higher priority tasks).
 //
 // How many clock cycles is the blocking?
 //
-// [Your answer here]
+// [My answer here]
+// 10 clock cycles (50 - 40)
 //
 // Finally continue out of the closure.
 //
@@ -255,7 +268,9 @@ const APP: () = {
 //
 // (gdb) x 0xe0001004
 //
-// [Your answer here]
+// [My answer here]
+// Hexadecimal: 0x00000034
+// Decimal: 52
 //
 // This is the total execution time of.
 //
@@ -278,7 +293,21 @@ const APP: () = {
 //
 // Motivate your answer (not just a number).
 //
-// [Your answer here]
+// [My answer here]
+// Both exti0 and exti1 will run during the execution of exti1:
+// 2 * (650 + 1522)
+// We lock / unlock a resource once during the execution:
+// 260 + 170
+// We will have two critical sections, one in exti0 and one in exti1, but 
+// this is constant:
+// 40
+// We will have two load actions, one in exti0 and one in exti1 when we
+// work with the shared resource.
+// 2 * (468)
+// Footprint program: 8184
+// 
+// Adding this up gives us a final result of: 13 934 clock cycles.
+//
 //
 // Notice, the Rust implementation is significantly faster than the C code version
 // of Real-Time For the Masses back in 2013.
@@ -288,4 +317,5 @@ const APP: () = {
 //
 // (Hint, what possible optimization can safely be applied.)
 //
-// [Your answer here]
+// [My answer here]
+// Multi-threading combined with memory sharing.

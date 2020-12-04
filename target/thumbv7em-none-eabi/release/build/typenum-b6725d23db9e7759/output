@@ -1,0 +1,2 @@
+cargo:rustc-env=TYPENUM_BUILD_CONSTS=/home/kalle/Desktop/rtic_f4xx_nucleo-master/target/thumbv7em-none-eabi/release/build/typenum-b6725d23db9e7759/out/consts.rs
+cargo:rustc-env=TYPENUM_BUILD_OP=/home/kalle/Desktop/rtic_f4xx_nucleo-master/target/thumbv7em-none-eabi/release/build/typenum-b6725d23db9e7759/out/op.rs

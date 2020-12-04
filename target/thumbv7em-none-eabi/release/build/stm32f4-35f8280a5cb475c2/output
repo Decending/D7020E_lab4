@@ -1,0 +1,3 @@
+cargo:rustc-link-search=/home/kalle/Desktop/rtic_f4xx_nucleo-master/target/thumbv7em-none-eabi/release/build/stm32f4-35f8280a5cb475c2/out
+cargo:rerun-if-changed=src/stm32f411/device.x
+cargo:rerun-if-changed=build.rs

@@ -1,0 +1,2 @@
+cargo:rustc-link-search=/home/kalle/Desktop/rtic_f4xx_nucleo-master/target/thumbv7em-none-eabi/debug/build/app-2b9ea35b31e3a2b5/out
+cargo:rerun-if-changed=memory.x

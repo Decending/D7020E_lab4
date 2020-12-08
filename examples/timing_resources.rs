@@ -320,4 +320,4 @@ const APP: () = {
 // (Hint, what possible optimization can safely be applied.)
 //
 // [My answer here]
-// The priority based memory sharing and scheduling.
+// The priority based memory sharing and scheduling removes the need to handle pointers and memory allocation.

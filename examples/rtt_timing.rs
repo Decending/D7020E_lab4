@@ -217,7 +217,8 @@ fn timed_loop() -> (u32, u32) {
 // Confer to the documentation:
 // https://developer.arm.com/documentation/ddi0439/b/Data-Watchpoint-and-Trace-Unit/DWT-Programmers-Model
 //
-// [Your answer here]
+// [My answer here]
+// There is no function call as it is optimized out during release. r1 contains the cycle count.
 //
 // Now check your answer by dumping the registers
 // (gdb) info registers
@@ -366,7 +367,7 @@ fn timed_loop() -> (u32, u32) {
 //
 // > cargo size --example rtt_timing --release --features nightly
 //
-// [Your answer here]
+// [My answer here]
 // text  data  bss  dec  hex  filename
 // 640   0     0    640  280  rtt_timing
 

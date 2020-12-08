@@ -133,7 +133,7 @@ const APP: () = {
 // Does RTIC infer any overhead?
 //
 // [My answer here]
-// Yes
+// Yes, (14-12 = 2) 2 cycles of overhead
 //
 // The debugger reports that the breakpoint was hit in the `run<closure>`.
 // The reason is that the RTIC implements the actual interrupt handler,
@@ -318,4 +318,4 @@ const APP: () = {
 // (Hint, what possible optimization can safely be applied.)
 //
 // [My answer here]
-// Multi-threading combined with memory sharing.
+// The priority based memory sharing and scheduling.

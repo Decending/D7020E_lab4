@@ -163,8 +163,8 @@ const APP: () = {
 // `exti0` was safe without locking the resource.
 //
 // [My answer here]
-// BASEPRI sätts till != 0, så alla threads med lägre prioritering blir 
-// blockerade tills BASEPRI tillåter det / den nuvarande threaden är 
+// BASEPRI sätts till != 0, så alla taskss med lägre prioritering blir 
+// blockerade tills BASEPRI tillåter det / den nuvarande tasken är 
 // terminerad
 //
 // In `exti1` we also access `shared` but this time through a lock.

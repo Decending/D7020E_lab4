@@ -84,6 +84,8 @@ const APP: () = {
 // 800024e: 80 f3 11 88  	msr	basepri, r0
 // 8000252: 70 47        	bx	lr
 //
+// The BASEPRI register is saved to r0, the algorithm is executed between movt and strd and finally the basepri register is restored and then we branch.
+//
 // > cargo run --example timing_resources --release --features nightly
 // Then continue to the first breakpoint instruction:
 // (gdb) c

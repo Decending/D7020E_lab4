@@ -84,7 +84,11 @@ const APP: () = {
 // 800024e: 80 f3 11 88  	msr	basepri, r0
 // 8000252: 70 47        	bx	lr
 //
-// The BASEPRI register is saved to r0, the algorithm is executed between movt and strd and finally the basepri register is restored and then we branch.
+// The basepri register is saved and set, this sets the active priority and the system handles resource allocation accordingly and saves the return destination for later.
+// A breakpoint is set. The movt instructions saves a 32 bit to r1, the #8192 being put "on top" (after the first 16 zeroes, starting from the lowest position).
+// ldrd loads and stores 32 bits from a base register with an immediate offset, this being our variable in the algorithm.
+// One is added to the loaded value in r2, then we increment the address in r3 with 0 and finally store the new value in r2 to address r3 with offset r1.
+// The basepri register is restored and then we branch.
 //
 // > cargo run --example timing_resources --release --features nightly
 // Then continue to the first breakpoint instruction:
@@ -299,7 +303,7 @@ const APP: () = {
 // Both exti0 and exti1 will run during the execution of exti1:
 // 2 * (650 + 1522)
 // We lock / unlock a resource once during the execution:
-// 260 + 170
+// 2 * (260 + 170)
 // We will have two critical sections, one in exti0 and one in exti1, but 
 // this is constant:
 // 40
@@ -308,7 +312,7 @@ const APP: () = {
 // 2 * (468)
 // Footprint program: 8184
 // 
-// Adding this up gives us a final result of: 13 934 clock cycles.
+// Adding this up gives us a final result of: 14 364 clock cycles.
 //
 //
 // Notice, the Rust implementation is significantly faster than the C code version
@@ -320,4 +324,7 @@ const APP: () = {
 // (Hint, what possible optimization can safely be applied.)
 //
 // [My answer here]
-// The priority based memory sharing and scheduling removes the need to handle pointers and memory allocation.
+// The priority based memory sharing and scheduling removes the need to handle pointers and memory allocation, but also enables the safe implementation of 
+// parallelization of the rust code. This can be done risk free to a further extent than in C.
+// You also have other efficiencies in rust such as the way that libraries may expose their objects by value as opposed to opaque pointers, which lets them be stored on the
+// stack as opposed to the heap and can hence be highly optimized or optimized out entirely.

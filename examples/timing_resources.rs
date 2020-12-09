@@ -85,6 +85,7 @@ const APP: () = {
 // 8000252: 70 47        	bx	lr
 //
 // The basepri register is saved and set, this sets the active priority and the system handles resource allocation accordingly and saves the return destination for later.
+// The basepri register defines the minimum priority for exceptions to be processed, it rejects all exceptions with the same or lower priority than the basepri value.
 // A breakpoint is set. The movt instructions saves a 32 bit to r1, the #8192 being put "on top" (after the first 16 zeroes, starting from the lowest position).
 // ldrd loads and stores 32 bits from a base register r3 with an immediate offset r1 into r2, this loaded value is our variable in the algorithm.
 // One is added to the loaded value in r2, then we increment the address in r3 with #0 and finally store the new value in r2 to address r3 with offset r1.

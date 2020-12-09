@@ -86,9 +86,9 @@ const APP: () = {
 //
 // The basepri register is saved and set, this sets the active priority and the system handles resource allocation accordingly and saves the return destination for later.
 // A breakpoint is set. The movt instructions saves a 32 bit to r1, the #8192 being put "on top" (after the first 16 zeroes, starting from the lowest position).
-// ldrd loads and stores 32 bits from a base register with an immediate offset, this being our variable in the algorithm.
-// One is added to the loaded value in r2, then we increment the address in r3 with 0 and finally store the new value in r2 to address r3 with offset r1.
-// The basepri register is restored and then we branch.
+// ldrd loads and stores 32 bits from a base register r3 with an immediate offset r1 into r2, this loaded value is our variable in the algorithm.
+// One is added to the loaded value in r2, then we increment the address in r3 with #0 and finally store the new value in r2 to address r3 with offset r1.
+// The basepri register is restored to the return destination and then we branch.
 //
 // > cargo run --example timing_resources --release --features nightly
 // Then continue to the first breakpoint instruction:

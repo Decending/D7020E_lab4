@@ -75,7 +75,8 @@ fn timed_loop() -> (u32, u32) {
 // 
 // A.3) Why do we need a wrapping subtraction?
 //
-// [Your answer here]
+// [My answer here]
+// As to avoid underflow
 //
 // ------------------------------------------------------------------------
 // Now try a release (optimized build, see `Cargo.toml` for build options).
@@ -96,7 +97,8 @@ fn timed_loop() -> (u32, u32) {
 // 
 // Why do you think it differs that much?
 //
-// [Your answer here]
+// [My answer here]
+// Unnecessary operations are optimized out during release.
 //
 // ------------------------------------------------------------------------
 // In the loop there is just a single assembly instruction (nop).
@@ -139,6 +141,15 @@ fn timed_loop() -> (u32, u32) {
 // Open the file in you editor and search for the `timed_loop`.
 //
 // [Assembly for function `timed_loop` here]
+//  8000232:      	movw	r1, #4100
+//  8000236:      	movw	r2, #10000
+//  800023a:      	movt	r1, #57344
+//  800023e:      	ldr	r0, [r1]
+//  8000240:      	subs	r2, #1
+//  8000242:      	nop
+//  8000244:      	bne	#-8 <timed_loop+0xe>
+//  8000246:      	ldr	r1, [r1]
+//  8000248:      	bx	lr
 //
 // Locate the loop body, and verify that it makes sense
 // based on the information from the technical documentation:
@@ -206,7 +217,8 @@ fn timed_loop() -> (u32, u32) {
 // Confer to the documentation:
 // https://developer.arm.com/documentation/ddi0439/b/Data-Watchpoint-and-Trace-Unit/DWT-Programmers-Model
 //
-// [Your answer here]
+// [My answer here]
+// There is no function call as it is optimized out during release. r1 contains the cycle count.
 //
 // Now check your answer by dumping the registers
 // (gdb) info registers
@@ -355,7 +367,7 @@ fn timed_loop() -> (u32, u32) {
 //
 // > cargo size --example rtt_timing --release --features nightly
 //
-// [Your answer here]
+// [My answer here]
 // text  data  bss  dec  hex  filename
 // 640   0     0    640  280  rtt_timing
 

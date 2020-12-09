@@ -1,0 +1,11 @@
+/home/kalle/Desktop/rtic_f4xx_nucleo-master/target/thumbv7em-none-eabi/debug/deps/generic_array-16600976ad6ab3da.rmeta: /home/kalle/.cargo/registry/src/github.com-1ecc6299db9ec823/generic-array-0.13.2/src/lib.rs /home/kalle/.cargo/registry/src/github.com-1ecc6299db9ec823/generic-array-0.13.2/src/hex.rs /home/kalle/.cargo/registry/src/github.com-1ecc6299db9ec823/generic-array-0.13.2/src/impls.rs /home/kalle/.cargo/registry/src/github.com-1ecc6299db9ec823/generic-array-0.13.2/src/arr.rs /home/kalle/.cargo/registry/src/github.com-1ecc6299db9ec823/generic-array-0.13.2/src/functional.rs /home/kalle/.cargo/registry/src/github.com-1ecc6299db9ec823/generic-array-0.13.2/src/iter.rs /home/kalle/.cargo/registry/src/github.com-1ecc6299db9ec823/generic-array-0.13.2/src/sequence.rs
+
+/home/kalle/Desktop/rtic_f4xx_nucleo-master/target/thumbv7em-none-eabi/debug/deps/generic_array-16600976ad6ab3da.d: /home/kalle/.cargo/registry/src/github.com-1ecc6299db9ec823/generic-array-0.13.2/src/lib.rs /home/kalle/.cargo/registry/src/github.com-1ecc6299db9ec823/generic-array-0.13.2/src/hex.rs /home/kalle/.cargo/registry/src/github.com-1ecc6299db9ec823/generic-array-0.13.2/src/impls.rs /home/kalle/.cargo/registry/src/github.com-1ecc6299db9ec823/generic-array-0.13.2/src/arr.rs /home/kalle/.cargo/registry/src/github.com-1ecc6299db9ec823/generic-array-0.13.2/src/functional.rs /home/kalle/.cargo/registry/src/github.com-1ecc6299db9ec823/generic-array-0.13.2/src/iter.rs /home/kalle/.cargo/registry/src/github.com-1ecc6299db9ec823/generic-array-0.13.2/src/sequence.rs
+
+/home/kalle/.cargo/registry/src/github.com-1ecc6299db9ec823/generic-array-0.13.2/src/lib.rs:
+/home/kalle/.cargo/registry/src/github.com-1ecc6299db9ec823/generic-array-0.13.2/src/hex.rs:
+/home/kalle/.cargo/registry/src/github.com-1ecc6299db9ec823/generic-array-0.13.2/src/impls.rs:
+/home/kalle/.cargo/registry/src/github.com-1ecc6299db9ec823/generic-array-0.13.2/src/arr.rs:
+/home/kalle/.cargo/registry/src/github.com-1ecc6299db9ec823/generic-array-0.13.2/src/functional.rs:
+/home/kalle/.cargo/registry/src/github.com-1ecc6299db9ec823/generic-array-0.13.2/src/iter.rs:
+/home/kalle/.cargo/registry/src/github.com-1ecc6299db9ec823/generic-array-0.13.2/src/sequence.rs:

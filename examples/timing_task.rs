@@ -109,8 +109,7 @@ const APP: () = {
 // Does RTIC infer any overhead for launching the task?
 //
 // [Your answer here]
-// Unsure how to answer this one, isn't it the restoring which takes
-// overhead? If so, then no, the launching doesn't cause the overhead.
+// No (11-12 = -1)
 //
 // Now we can continue to measure the round trip time.
 //

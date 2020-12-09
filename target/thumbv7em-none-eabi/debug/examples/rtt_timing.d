@@ -1,0 +1,1 @@
+/home/kalle/Desktop/rtic_f4xx_nucleo-master/target/thumbv7em-none-eabi/debug/examples/rtt_timing: /home/kalle/Desktop/rtic_f4xx_nucleo-master/build.rs /home/kalle/Desktop/rtic_f4xx_nucleo-master/examples/rtt_timing.rs /home/kalle/Desktop/rtic_f4xx_nucleo-master/memory.x build.rs link.x.in memory.x src/stm32f411/device.x

@@ -40,9 +40,9 @@ const APP: () = {
         rtic::pend(stm32f411::Interrupt::EXTI0);
         asm::bkpt();
         cx.resources.shared.lock(|shared| {
-            // asm::bkpt();
+            asm::bkpt();
             *shared += 1;
-            // asm::bkpt();
+            asm::bkpt();
         });
         asm::bkpt();
     }
@@ -83,6 +83,13 @@ const APP: () = {
 // 800024a: c1 e9 00 23  	strd	r2, r3, [r1]
 // 800024e: 80 f3 11 88  	msr	basepri, r0
 // 8000252: 70 47        	bx	lr
+//
+// The basepri register is saved and set, this sets the active priority and the system handles resource allocation accordingly and saves the return destination for later.
+// The basepri register defines the minimum priority for exceptions to be processed, it rejects all exceptions with the same or lower priority than the basepri value.
+// A breakpoint is set. The movt instructions saves a 32 bit to r1, the #8192 being put "on top" (after the first 16 zeroes, starting from the lowest position).
+// ldrd loads and stores 32 bits from a base register r3 with an immediate offset r1 into r2, this loaded value is our variable in the algorithm.
+// One is added to the loaded value in r2, then we increment the address in r3 with #0 and finally store the new value in r2 to address r3 with offset r1.
+// The basepri register is restored to the return destination and then we branch.
 //
 // > cargo run --example timing_resources --release --features nightly
 // Then continue to the first breakpoint instruction:
@@ -127,11 +134,13 @@ const APP: () = {
 //
 // What was the software latency observed to enter the task?
 //
-// [Your answer here]
+// [My answer here]
+// 14 clockcycles (16-2)
 //
 // Does RTIC infer any overhead?
 //
-// [Your answer here]
+// [My answer here]
+// Yes, (14-12 = 2) 2 cycles of overhead
 //
 // The debugger reports that the breakpoint was hit in the `run<closure>`.
 // The reason is that the RTIC implements the actual interrupt handler,
@@ -149,14 +158,19 @@ const APP: () = {
 //
 // (gdb) x 0xe0001004
 //
-// [Your answer here]
+// [My answer here]
+// Hexadecimal: 0x00000025
+// Decimal: 37
 //
 // You should have a total execution time in the range of 30-40 cycles.
 //
 // Explain the reason (for this case) that resource access in
 // `exti0` was safe without locking the resource.
 //
-// [Your answer here]
+// [My answer here]
+// BASEPRI sätts till != 0, så alla taskss med lägre prioritering blir 
+// blockerade tills BASEPRI tillåter det / den nuvarande tasken är 
+// terminerad
 //
 // In `exti1` we also access `shared` but this time through a lock.
 //
@@ -184,12 +198,14 @@ const APP: () = {
 //
 // (gdb) x 0xe0001004
 //
-// [Your answer here]
+// [My answer here]
+// Hexadecimal: 0x00000034
+// Decimal: 52
 //
 // Calculate the total time (in cycles), for this section of code.
 //
-// [Your answer here]
-//
+// [My answer here]
+// 15 cycles (52 - 37)
 // You should get a value around 15 cycles.
 //
 // Now look at the "critical section", i.e., how many cycles
@@ -228,7 +244,9 @@ const APP: () = {
 //
 // (gdb) x 0xe0001004
 //
-// [Your answer here]
+// [My answer here]
+// Hexadecimal: 0x00000028
+// Decimal: 40
 //
 // (gdb) c
 //
@@ -238,14 +256,16 @@ const APP: () = {
 //
 // (gdb) x 0xe0001004
 //
-// [Your answer here]
-//
+// [My answer here]
+// Hexadecimal: 0x00000032
+// Decimal: 50
 // From a real-time perspective the critical section infers
 // blocking (of higher priority tasks).
 //
 // How many clock cycles is the blocking?
 //
-// [Your answer here]
+// [My answer here]
+// 10 clock cycles (50 - 40)
 //
 // Finally continue out of the closure.
 //
@@ -255,7 +275,9 @@ const APP: () = {
 //
 // (gdb) x 0xe0001004
 //
-// [Your answer here]
+// [My answer here]
+// Hexadecimal: 0x00000034
+// Decimal: 52
 //
 // This is the total execution time of.
 //
@@ -278,7 +300,21 @@ const APP: () = {
 //
 // Motivate your answer (not just a number).
 //
-// [Your answer here]
+// [My answer here]
+// Both exti0 and exti1 will run during the execution of exti1:
+// 2 * (650 + 1522)
+// We lock / unlock a resource once during the execution:
+// 2 * (260 + 170)
+// We will have two critical sections, one in exti0 and one in exti1, but 
+// this is constant:
+// 40
+// We will have two load actions, one in exti0 and one in exti1 when we
+// work with the shared resource.
+// 2 * (468)
+// Footprint program: 8184
+// 
+// Adding this up gives us a final result of: 14 364 clock cycles.
+//
 //
 // Notice, the Rust implementation is significantly faster than the C code version
 // of Real-Time For the Masses back in 2013.
@@ -288,4 +324,8 @@ const APP: () = {
 //
 // (Hint, what possible optimization can safely be applied.)
 //
-// [Your answer here]
+// [My answer here]
+// The priority based memory sharing and scheduling removes the need to handle pointers and memory allocation, but also enables the safe implementation of 
+// parallelization of the rust code. This can be done risk free to a further extent than in C.
+// You also have other efficiencies in rust such as the way that libraries may expose their objects by value as opposed to opaque pointers, which lets them be stored on the
+// stack as opposed to the heap and can hence be highly optimized or optimized out entirely.

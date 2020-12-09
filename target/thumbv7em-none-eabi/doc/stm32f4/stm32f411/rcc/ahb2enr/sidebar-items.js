@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["OTGFSEN_A","USB OTG FS clock enable"]],"struct":[["OTGFSEN_W","Write proxy for field `OTGFSEN`"]],"type":[["OTGFSEN_R","Reader of field `OTGFSEN`"],["R","Reader of register AHB2ENR"],["W","Writer for register AHB2ENR"]]});

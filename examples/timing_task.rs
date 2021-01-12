@@ -36,7 +36,7 @@ const APP: () = {
     #[task(binds = EXTI0)]
     fn exti0(_cx: exti0::Context) {
         asm::bkpt();
-    }	
+    }
 };
 
 // Now we are going to have a look at the scheduling of RTIC tasks
@@ -81,19 +81,11 @@ const APP: () = {
 //
 // (gdb) x 0xe0001004
 //
-// [My answer here]
-// Hexadecimal: 0x0000000b
-// Decimal: 11
-// 
+// [Your answer here]
+//
 // (gdb) disassemble
 //
-// [My answer here]
-// Dump of assembler code for function timing_task::APP::EXTI0:
-//=> 0x08000232 <+0>:	bkpt	0x0000
-//   0x08000234 <+2>:	movs	r0, #0
-//   0x08000236 <+4>:	msr	BASEPRI, r0
-//   0x0800023a <+8>:	bx	lr
-// End of assembler dump.
+// [Your answer here]
 //
 // You should see that we hit the breakpoint in `exti0`, and
 // that the code complies to the objdump EXTI disassembly.
@@ -103,13 +95,11 @@ const APP: () = {
 //
 // What was the software latency observed to enter the task?
 //
-// [My answer here]
-// It took 11 clock cycles
-// 
+// [Your answer here]
+//
 // Does RTIC infer any overhead for launching the task?
 //
 // [Your answer here]
-// No (11-12 = -1)
 //
 // Now we can continue to measure the round trip time.
 //
@@ -119,9 +109,7 @@ const APP: () = {
 //
 // (gdb) x 0xe0001004
 //
-// [My answer here]
-// Hexadecimal: 0x00000017
-// Decimal: 23
+// [Your answer here]
 //
 // Looking at the EXTI0 (exti0) code, we see two additional
 // instructions used to restore the BASEPRI register.

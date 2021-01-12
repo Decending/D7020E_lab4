@@ -1,41 +1,39 @@
 //! examples/rtt_timing.rs
 
-//#![deny(unsafe_code)]
+#![deny(unsafe_code)]
 #![deny(warnings)]
 #![no_main]
 #![no_std]
 
 use cortex_m::{asm, peripheral::DWT};
-use panic_halt as _;
-//use rtt_target::{rprintln, rtt_init_print};
+use panic_rtt_target as _;
+use rtt_target::{rprintln, rtt_init_print};
 use stm32f4;
 
 #[rtic::app(device = stm32f4)]
 const APP: () = {
     #[init]
-    fn init(cx: init::Context) {
-        //rtt_init_print!();
-        //rprintln!("init");
+    fn init(mut cx: init::Context) {
+        rtt_init_print!();
+        rprintln!("init");
 
         // Initialize (enable) the monotonic timer (CYCCNT)
-        //cx.core.DCB.enable_trace();
-        //cx.core.DWT.enable_cycle_counter();
-	unsafe {
-	   cx.core.DWT.cyccnt.write(0)
-	}
-        //rprintln!("start timed_loop");
-        let (_start, _end) = timed_loop();
-        //rprintln!(
-        //    "start {}, end {}, diff {}",
-        //    start,
-        //    end,
-        //    end.wrapping_sub(start)
-        //);
+        cx.core.DCB.enable_trace();
+        cx.core.DWT.enable_cycle_counter();
+
+        rprintln!("start timed_loop");
+        let (start, end) = timed_loop();
+        rprintln!(
+            "start {}, end {}, diff {}",
+            start,
+            end,
+            end.wrapping_sub(start)
+        );
     }
 
     #[idle]
     fn idle(_cx: idle::Context) -> ! {
-        //rprintln!("idle");
+        rprintln!("idle");
         loop {
             continue;
         }
@@ -65,40 +63,34 @@ fn timed_loop() -> (u32, u32) {
 // A.1) What is the cycle count for the loop?
 // > cargo run --example rtt_timing
 //
-// [My answer here]
-// start 1816141940, end 1820932090, diff 4790150
+// [Your answer here]
 //
 // A.2) How many cycles per iteration?
 //
-// [My answer here]
-// diff / 10000 = 480
-// 
+// [Your answer here]
+//
 // A.3) Why do we need a wrapping subtraction?
 //
-// [My answer here]
-// As to avoid underflow
+// [Your answer here]
 //
 // ------------------------------------------------------------------------
 // Now try a release (optimized build, see `Cargo.toml` for build options).
 // B.1) What is the cycle count for the loop?
 // > cargo run --example rtt_timing --release
 //
-// [My answer here]
-// start 4172530636, end 4172600637, diff 70001
+// [Your answer here]
 //
 // B.2) How many cycles per iteration?
 //
-// [My answer here]
-// diff / 10000 = 7
+// [Your answer here]
+//
 // What is the speedup (A/B)?
 //
-// [My answer here]
-// 480 / 7 = ca 68.6
-// 
+// [Your answer here]
+//
 // Why do you think it differs that much?
 //
-// [My answer here]
-// Unnecessary operations are optimized out during release.
+// [Your answer here]
 //
 // ------------------------------------------------------------------------
 // In the loop there is just a single assembly instruction (nop).
@@ -120,18 +112,15 @@ fn timed_loop() -> (u32, u32) {
 // C.1) What is the cycle count for the loop?
 // > cargo run --example rtt_timing --release --features nightly
 //
-// [My answer here]
-// start 2860471039, end 2860511040, diff 40001
+// [Your answer here]
 //
 // C.2) How many cycles per iteration?
 //
-// [My answer here]
-// diff / 10000 = 4
+// [Your answer here]
 //
 // What is the speedup (A/C)?
 //
-// [My answer here]
-// 480 / 4 = 120
+// [Your answer here]
 //
 // ------------------------------------------------------------------------
 // D) Now lets have a closer look at the generated assembly.
@@ -141,15 +130,6 @@ fn timed_loop() -> (u32, u32) {
 // Open the file in you editor and search for the `timed_loop`.
 //
 // [Assembly for function `timed_loop` here]
-//  8000232:      	movw	r1, #4100
-//  8000236:      	movw	r2, #10000
-//  800023a:      	movt	r1, #57344
-//  800023e:      	ldr	r0, [r1]
-//  8000240:      	subs	r2, #1
-//  8000242:      	nop
-//  8000244:      	bne	#-8 <timed_loop+0xe>
-//  8000246:      	ldr	r1, [r1]
-//  8000248:      	bx	lr
 //
 // Locate the loop body, and verify that it makes sense
 // based on the information from the technical documentation:
@@ -217,39 +197,12 @@ fn timed_loop() -> (u32, u32) {
 // Confer to the documentation:
 // https://developer.arm.com/documentation/ddi0439/b/Data-Watchpoint-and-Trace-Unit/DWT-Programmers-Model
 //
-// [My answer here]
-// There is no function call as it is optimized out during release. r1 contains the cycle count.
+// [Your answer here]
 //
 // Now check your answer by dumping the registers
 // (gdb) info registers
 //
 // [Register dump here]
-//(gdb) info registers
-// r0             0x80000000          -2147483648
-// r1             0xe0001004          -536866812
-// r2             0x2710              10000
-// r3             0xa                 10
-// r4             0x20000000          536870912
-// r5             0x20000430          536871984
-// r6             0x0                 0
-// r7             0x2000ffe8          536936424
-// r8             0x0                 0
-// r9             0x0                 0
-// r10            0x0                 0
-// r11            0x0                 0
-// r12            0x1                 1
-// sp             0x2000ff98          0x2000ff98
-// lr             0x8000373           134218611
-// pc             0x800023e           0x800023e <rtt_timing::timed_loop+12>
-// xPSR           0x81000000          -2130706432
-// fpscr          0x0                 0
-// msp            0x2000ff98          0x2000ff98
-// psp            0x0                 0x0
-// primask        0x1                 1
-// basepri        0x0                 0
-// faultmask      0x0                 0
-// control        0x0                 0
-
 //
 // We can now set a breakpoint exactly at the `nop`.
 //
@@ -274,23 +227,19 @@ fn timed_loop() -> (u32, u32) {
 //
 // (gdb) x 0xe0001004
 //
-// [My answer here]
-// Hexadecimal: 0x2ef1264b
-// Decimal: 787555915
+// [Your answer here]
 //
 // Now, let's execute one iteration:
 // (gdb) continue
 //
 // What is now the current value of the cycle counter?
 //
-// [My answer here]
-// Hexadecimal: 0x2ef1264f
-// Decimal: 787555919
+// [Your answer here]
 //
 // By how much does the cycle counter increase for each iteration?
 //
-// [My answer here]
-// 4
+// [Your answer here]
+//
 // ------------------------------------------------------------------------
 // F) Reseting the cycle counter
 // You can restart the program by a "soft reset".
@@ -325,9 +274,7 @@ fn timed_loop() -> (u32, u32) {
 // What is the initial value of the cycle counter
 // (when hitting the `timed_loop` breakpoint)?
 //
-// [My answer here]
-// Hexadecimal: 0x0000017c
-// Decimal: 380
+// [Your answer here]
 //
 // ------------------------------------------------------------------------
 // F) Finally some statics
@@ -367,10 +314,8 @@ fn timed_loop() -> (u32, u32) {
 //
 // > cargo size --example rtt_timing --release --features nightly
 //
-// [My answer here]
-// text  data  bss  dec  hex  filename
-// 640   0     0    640  280  rtt_timing
-
+// [Your answer here]
+//
 // I was able to get down to:
 // > cargo size --example rtt_timing --release --features nightly
 // Compiling app v0.1.0 (/home/pln/courses/e7020e/app)

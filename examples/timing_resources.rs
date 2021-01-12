@@ -40,9 +40,9 @@ const APP: () = {
         rtic::pend(stm32f411::Interrupt::EXTI0);
         asm::bkpt();
         cx.resources.shared.lock(|shared| {
-            asm::bkpt();
+            // asm::bkpt();
             *shared += 1;
-            asm::bkpt();
+            // asm::bkpt();
         });
         asm::bkpt();
     }
@@ -71,25 +71,7 @@ const APP: () = {
 //
 // Explain what is happening here in your own words.
 //
-// [My code here]
-// 08000232 <EXTI0>:
-// 8000232: 40 f2 00 01  	movw	r1, #0
-// 8000236: ef f3 11 80  	mrs	r0, basepri
-// 800023a: 00 be        	bkpt	#0
-// 800023c: c2 f2 00 01  	movt	r1, #8192
-// 8000240: d1 e9 00 23  	ldrd	r2, r3, [r1]
-// 8000244: 01 32        	adds	r2, #1
-// 8000246: 43 f1 00 03  	adc	r3, r3, #0
-// 800024a: c1 e9 00 23  	strd	r2, r3, [r1]
-// 800024e: 80 f3 11 88  	msr	basepri, r0
-// 8000252: 70 47        	bx	lr
-//
-// The basepri register is saved and set, this sets the active priority and the system handles resource allocation accordingly and saves the return destination for later.
-// The basepri register defines the minimum priority for exceptions to be processed, it rejects all exceptions with the same or lower priority than the basepri value.
-// A breakpoint is set. The movt instructions saves a 32 bit to r1, the #8192 being put "on top" (after the first 16 zeroes, starting from the lowest position).
-// ldrd loads and stores 32 bits from a base register r3 with an immediate offset r1 into r2, this loaded value is our variable in the algorithm.
-// One is added to the loaded value in r2, then we increment the address in r3 with #0 and finally store the new value in r2 to address r3 with offset r1.
-// The basepri register is restored to the return destination and then we branch.
+// [Your code here]
 //
 // > cargo run --example timing_resources --release --features nightly
 // Then continue to the first breakpoint instruction:
@@ -100,8 +82,7 @@ const APP: () = {
 // 39	        asm::bkpt();
 //
 // (gdb) x 0xe0001004
-// Hexadecimal: 0x00000002
-// Decimal: 2
+// 2
 //
 // (gdb) c
 //  received signal SIGTRAP, Trace/breakpoint trap.
@@ -109,38 +90,22 @@ const APP: () = {
 //
 // (gdb) x 0xe0001004
 //
-// [My answer here]
-// Hexadecimal: 0x00000010
-// Decimal: 16
+// [Your answer here]
 //
 // (gdb) disassemble
 //
-// [My answer here]
-// Dump of assembler code for function timing_resources::APP::EXTI0:
-//   0x08000232 <+0>:	movw	r1, #0
-//   0x08000236 <+4>:	mrs	r0, BASEPRI
-//=> 0x0800023a <+8>:	bkpt	0x0000
-//   0x0800023c <+10>:	movt	r1, #8192	; 0x2000
-//   0x08000240 <+14>:	ldrd	r2, r3, [r1]
-//   0x08000244 <+18>:	adds	r2, #1
-//   0x08000246 <+20>:	adc.w	r3, r3, #0
-//   0x0800024a <+24>:	strd	r2, r3, [r1]
-//   0x0800024e <+28>:	msr	BASEPRI, r0
-//   0x08000252 <+32>:	bx	lr
-
+// [Your answer here]
 //
 // You should see that we hit the breakpoint in `exti0`, and
 // that the code complies to the objdump EXTI disassembly.
 //
 // What was the software latency observed to enter the task?
 //
-// [My answer here]
-// 14 clockcycles (16-2)
+// [Your answer here]
 //
 // Does RTIC infer any overhead?
 //
-// [My answer here]
-// Yes, (14-12 = 2) 2 cycles of overhead
+// [Your answer here]
 //
 // The debugger reports that the breakpoint was hit in the `run<closure>`.
 // The reason is that the RTIC implements the actual interrupt handler,
@@ -158,19 +123,14 @@ const APP: () = {
 //
 // (gdb) x 0xe0001004
 //
-// [My answer here]
-// Hexadecimal: 0x00000025
-// Decimal: 37
+// [Your answer here]
 //
 // You should have a total execution time in the range of 30-40 cycles.
 //
 // Explain the reason (for this case) that resource access in
 // `exti0` was safe without locking the resource.
 //
-// [My answer here]
-// BASEPRI sätts till != 0, så alla taskss med lägre prioritering blir 
-// blockerade tills BASEPRI tillåter det / den nuvarande tasken är 
-// terminerad
+// [Your answer here]
 //
 // In `exti1` we also access `shared` but this time through a lock.
 //
@@ -193,19 +153,18 @@ const APP: () = {
 // execution time of the lock.
 //
 // (gdb) c
-// timing_resources::exti1 (cx=...) at examples/timing_resources.rs:36
-// 36              asm::bkpt();
+//  received signal SIGTRAP, Trace/breakpoint trap.
+// timing_resources::exti1 (cx=...) at examples/timing_resources.rs:47
+// 47	        asm::bkpt();
 //
 // (gdb) x 0xe0001004
 //
-// [My answer here]
-// Hexadecimal: 0x00000034
-// Decimal: 52
+// [Your answer here]
 //
 // Calculate the total time (in cycles), for this section of code.
 //
-// [My answer here]
-// 15 cycles (52 - 37)
+// [Your answer here]
+//
 // You should get a value around 15 cycles.
 //
 // Now look at the "critical section", i.e., how many cycles
@@ -244,9 +203,7 @@ const APP: () = {
 //
 // (gdb) x 0xe0001004
 //
-// [My answer here]
-// Hexadecimal: 0x00000028
-// Decimal: 40
+// [Your answer here]
 //
 // (gdb) c
 //
@@ -256,16 +213,14 @@ const APP: () = {
 //
 // (gdb) x 0xe0001004
 //
-// [My answer here]
-// Hexadecimal: 0x00000032
-// Decimal: 50
+// [Your answer here]
+//
 // From a real-time perspective the critical section infers
 // blocking (of higher priority tasks).
 //
 // How many clock cycles is the blocking?
 //
-// [My answer here]
-// 10 clock cycles (50 - 40)
+// [Your answer here]
 //
 // Finally continue out of the closure.
 //
@@ -275,11 +230,9 @@ const APP: () = {
 //
 // (gdb) x 0xe0001004
 //
-// [My answer here]
-// Hexadecimal: 0x00000034
-// Decimal: 52
+// [Your answer here]
 //
-// This is the total execution time of.
+// This is the total execution time of:
 //
 // - pending a task `exti0` for execution
 // - preempt `exti1`
@@ -294,27 +247,13 @@ const APP: () = {
 //
 // You find a comparison to a typical threaded counterpart `freeRTOS` in Table 1.
 //
-// Give a rough estimate based on this info how long the complete task `uart1`,
+// Give a rough estimate based on this info how long the complete task `exti1`,
 // would take to execute if written in FreeRTOS. (Include the context switch, to higher
 // priority task, the mutex lock/unlock in both "threads".)
 //
 // Motivate your answer (not just a number).
 //
-// [My answer here]
-// Both exti0 and exti1 will run during the execution of exti1:
-// 2 * (650 + 1522)
-// We lock / unlock a resource once during the execution:
-// 2 * (260 + 170)
-// We will have two critical sections, one in exti0 and one in exti1, but 
-// this is constant:
-// 40
-// We will have two load actions, one in exti0 and one in exti1 when we
-// work with the shared resource.
-// 2 * (468)
-// Footprint program: 8184
-// 
-// Adding this up gives us a final result of: 14 364 clock cycles.
-//
+// [Your answer here]
 //
 // Notice, the Rust implementation is significantly faster than the C code version
 // of Real-Time For the Masses back in 2013.
@@ -322,10 +261,6 @@ const APP: () = {
 // Why do you think RTIC + Rust + LLVM can do a better job than hand written
 // C code + Macros + gcc?
 //
-// (Hint, what possible optimization can safely be applied.)
+// (Hint, what possible optimization can safely be applied by RTIC + Rust + LLVM.)
 //
-// [My answer here]
-// The priority based memory sharing and scheduling removes the need to handle pointers and memory allocation, but also enables the safe implementation of 
-// parallelization of the rust code. This can be done risk free to a further extent than in C.
-// You also have other efficiencies in rust such as the way that libraries may expose their objects by value as opposed to opaque pointers, which lets them be stored on the
-// stack as opposed to the heap and can hence be highly optimized or optimized out entirely.
+// [Your answer here]

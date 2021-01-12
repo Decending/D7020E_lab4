@@ -21,10 +21,10 @@ const APP: () = {
     #[idle]
     fn idle(_cx: idle::Context) -> ! {
         rprintln!("idle");
-        panic!("panic");
-        //loop {
-        //    continue;
-        //}
+        // panic!("panic");
+        loop {
+            continue;
+        }
     }
 };
 
@@ -63,15 +63,7 @@ const APP: () = {
 //
 // What is the output?
 //
-// [My answer here]
-// The program will not compile, as it contains unreachable code. By
-// removing the incredibly necessary loop we get the same output as in A
-// but with an added line at the end, demonstrated below:
-
-// init
-// idle
-// panicked at 'panic', src/main.rs:24:9   <-- the new line
-
+// [Your answer here]
 //
 // D) Panic halt
 // Tracing is nice during development, but requires a debugger attached
@@ -84,30 +76,14 @@ const APP: () = {
 //
 // What is the output?
 //
-// [My answer here]
-// The exact same output as during A.
+// [Your answer here]
 //
 // Now press Ctrl-C
 //
 // What is the output?
 //
-// [My answer here]
-//stack backtrace:
-//   0: core::sync::atomic::compiler_fence
-//        at /rustc/7eac88abb2e57e752f3302f02be5f3ce3d7adfb4/library/core/src/sync/atomic.rs:2637
-//   1: rust_begin_unwind
-//        at /home/kalle/.cargo/registry/src/github.com-1ecc6299db9ec823/panic-halt-0.2.0/src/lib.rs:33
-//   2: core::panicking::panic_fmt
-//        at /rustc/7eac88abb2e57e752f3302f02be5f3ce3d7adfb4/library/core/src/panicking.rs:85
-//   3: core::panicking::panic
-//        at /rustc/7eac88abb2e57e752f3302f02be5f3ce3d7adfb4/library/core/src/panicking.rs:50
-//   4: app::idle
-//        at src/main.rs:24
-//   5: main
-//        at src/main.rs:13
-//   6: Reset
-//        at /home/kalle/.cargo/registry/src/github.com-1ecc6299db9ec823/cortex-m-rt-0.6.13/src/lib.rs:526
- 
+// [Your answer here]
+//
 // E) Find the source
 // Figure out how to find the source of `panic_halt`, and look at the implementation.
 //
@@ -115,15 +91,4 @@ const APP: () = {
 // - `crates.io`
 //
 // Paste the implementation here
-// [My answer here]
-// The answer was found by following the earlier errors with duplicated
-// handlers. The error leads you to a file which references the source.
-// The implementation is below:
-//
-//  fn panic(_info: &PanicInfo) -> ! {
-//    loop {
-//        atomic::compiler_fence(Ordering::SeqCst);
-//      }
-//  }
-//
-// Found at: home/kalle/.cargo/registry/src/github.com-1ecc6299db9ec823/panic-rtt-target-0.1.1/src/lib.rs
+// [Your answer here]
